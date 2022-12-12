@@ -1,55 +1,54 @@
 package com.example.finalproyect
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.finalproyec.CrunchifyGetPingStatus
-import java.io.IOException
-import java.net.*
+import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.ViewModelProvider
+import com.example.finalproyect.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     companion object {
         val TAG = "mainActivity"
     }
 
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: ViewModelPlatform
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        CrunchifyGetPingStatus.getStatus("https://mercadolibre.com")
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        viewModel = ViewModelProvider(this)[ViewModelPlatform::class.java]
+
+        initComponent()
+
+       /* Thread {
+            runOnUiThread {
+            }
+        }.start()*/
     }
 
-    fun pingHost(host: String?, port: Int, timeout: Int): Boolean {
-        try {
-            Socket().use { socket ->
-                socket.connect(InetSocketAddress(host, port), timeout)
-                return true
-            }
-        } catch (e: IOException) {
-            return false // Either timeout or unreachable or failed DNS lookup.
+    fun initComponent() {
+        binding.etName.doAfterTextChanged {
+            viewModel.setName(it.toString())
+        }
+
+        binding.etWebSite.doAfterTextChanged {
+            viewModel.setDir(it.toString())
+        }
+        setBtnConfirmVisibilityListener()
+    }
+
+    private fun setBtnConfirmVisibilityListener() {
+        viewModel.statusSite.observe(this) {
+            viewModel.validateSite()
+            binding.btnConfirm.isEnabled = it
         }
     }
 
-    fun ping(params: String) {
-        try {
-            val url = URL("http://" + params[0])
-            val urlc = url.openConnection() as HttpURLConnection
-            //      urlc.setRequestProperty("User-Agent", "Android Application:" + Z.APP_VERSION)
-            urlc.setRequestProperty("Connection", "close")
-            urlc.connectTimeout = 1000 * 30 // Timeout is in seconds
-            urlc.connect()
-            if (urlc.responseCode == 200) {
-                Log.d(TAG, "getResponseCode == 200")
-
-            }
-        } catch (e1: MalformedURLException) {
-            e1.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-
-    fun getStatus(url: String): String {
+    /*fun getStatus(url: String): String {
         var result = ""
         var code = 200
         try {
@@ -59,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             connection.connectTimeout = 3000
             connection.connect()
             code = connection.responseCode
-            result = if (code == 200) {
+            result = if (code in 200..399) {
                 "-> Green <-\tCode: $code"
             } else {
                 "-> Yellow <-\tCode: $code"
@@ -69,6 +68,53 @@ class MainActivity : AppCompatActivity() {
         }
         println("$url\t\tStatus:$result")
         return result
+    }*/
+
+
+/*
+    private fun exists(URLName: String?): Boolean {
+        return try {
+            HttpURLConnection.setFollowRedirects(false)
+            // note : you may also need
+            // HttpURLConnection.setInstanceFollowRedirects(false)
+            val con = URL(URLName)
+                .openConnection() as HttpURLConnection
+            con.requestMethod = "HEAD"
+            con.responseCode == HttpURLConnection.HTTP_OK
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
+
+    fun isHostAvailable(urlPath: String): Boolean {
+        try {
+            val url = URL(urlPath)
+            val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+            connection.setRequestProperty("Connection", "close")
+            connection.connectTimeout = 3000
+            connection.connect()
+
+            return when (connection.responseCode) {
+                200, 403 -> true
+                else -> false
+            }
+
+        } catch (e: Exception) {
+            when (e) {
+                is MalformedURLException -> "loadLink: Invalid URL ${e.message}"
+                is IOException -> "loadLink: IO Exception reading data: ${e.message}"
+                is SecurityException -> {
+                    e.printStackTrace()
+                    "loadLink: Security Exception. Needs permission? ${e.message}"
+                }
+                else -> "Unknown error: ${e.message}"
+            }
+        }
+        return false
+    }
+*/
+
 }
+
 

@@ -102,6 +102,7 @@
         android:layout_marginEnd="16dp"
         android:background="@drawable/corner_button"
         android:text="CONFIRM"
+        android:enabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/btnCancel"
         app:layout_constraintTop_toTopOf="@id/btnCancel" />
