@@ -1,6 +1,7 @@
 package com.example.finalproyect
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
@@ -13,14 +14,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: ViewModelPlatform
+    private val viewModel: ViewModelPlatform by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(this)[ViewModelPlatform::class.java]
 
         initComponent()
 
@@ -36,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.etWebSite.doAfterTextChanged {
-            viewModel.setDir(it.toString())
+            viewModel.setDir(it.toString().addHttp())
         }
         setBtnConfirmVisibilityListener()
     }

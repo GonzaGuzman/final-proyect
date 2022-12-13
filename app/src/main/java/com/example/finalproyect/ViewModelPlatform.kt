@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
 
@@ -26,8 +27,8 @@ class ViewModelPlatform(val repository: PlatformRepository) : ViewModel() {
     }
 
     fun validateSite() {
-        thread {
+        viewModelScope.launch(viewModelScope.coroutineContext + Dispatchers.IO) {
             _statusSite.postValue(repository.getStatus(dirSite.value.toString()))
-        }.start()
+        }
     }
 }
